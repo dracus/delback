@@ -1,0 +1,18 @@
+What TODO
+
+Git init
+Better error handling of copy
+Edoc
+Update README
+Use Eunit
+http://tidier.softlab.ntua.gr:20000/tidier/getstarted
+Make target for dialyzer
+
+FUTURE
+
+Better error handling of all
+Add GUI
+Use OTP structure
+Rebar build script
+Support hot-code loading
+Net capable
