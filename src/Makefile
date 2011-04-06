@@ -36,7 +36,8 @@ ERL=erl -boot start_clean
 # ----------
 
 MODULES= \
-	delback
+	delback \
+	delback_store
 
 TARGET_FILES=$(MODULES:%=$(EBIN)/%.beam)
 

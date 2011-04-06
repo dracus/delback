@@ -25,9 +25,15 @@
 %% THE SOFTWARE.
 
 -module(delback).
--export([copy_files/1]).
+-export([start/0, stop/0, copy_files/1]).
 
 -include_lib("kernel/include/file.hrl").
+
+start() ->
+    delback_store:open("delback.db").
+
+stop() ->
+    delback_store:close().
 
 copy_files([]) ->
     done;
@@ -52,6 +58,7 @@ copy_files(Dir, To) ->
 %% only copy file if it do not exist or have another modified date
 backup_file(From, To, File) ->
     {ok, SrcInfo} = file:read_file_info(From ++ File),
+    Checksum = delback_store:lookup(crypto:sha(From ++ File)),
     case file:read_file_info(To ++ File) of
 	{ok, DstInfo} -> 
 	    DstModifiedTime = DstInfo#file_info.mtime,
@@ -79,9 +86,11 @@ do_file_copy(Src, Dst, Info) ->
 
 
 copy_test() ->
+    start(),
     clean_up(),
     generate_test_data(),
-    copy_files("../test/src/", "../test/dst/").
+    copy_files("../test/src/", "../test/dst/"),
+    stop().
 
 clean_up() ->
     clean_up(src, "../test/src/"),
