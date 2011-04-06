@@ -39,9 +39,11 @@ open(File) ->
 close() ->
     dets:close(?MODULE).
 
+%% @spec store(string(), string())
 store(Key, Filename) ->
     dets:insert(?MODULE, [{Key, Filename}]).
 
+%% @spec lookup(string()) -> error | string().
 lookup(Key) ->
     case dets:lookup(?MODULE, Key) of
 	[] -> error;
