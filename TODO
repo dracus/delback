@@ -1,10 +1,10 @@
 What TODO
 
-Git init
 Better error handling of copy
 Edoc
 Update README
-Use Eunit
+Fix TEST define in Makefile
+Add mnesia for storing what we have copied (checksums)
 http://tidier.softlab.ntua.gr:20000/tidier/getstarted
 Make target for dialyzer
 

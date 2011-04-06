@@ -25,10 +25,9 @@
 %% THE SOFTWARE.
 
 -module(delback).
--export([copy_files/1, test/0, clean_up/0]).
+-export([copy_files/1]).
 
 -include_lib("kernel/include/file.hrl").
-
 
 copy_files([]) ->
     done;
@@ -75,8 +74,11 @@ do_file_copy(Src, Dst, Info) ->
 
 
 %% TEST
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
 
-test() ->
+
+copy_test() ->
     clean_up(),
     generate_test_data(),
     copy_files("../test/src/", "../test/dst/").
@@ -103,3 +105,5 @@ clean_up(dst, Dir) ->
     file:delete(Dir ++ "file.dat"),
     file:delete(Dir ++ "dir/fil2.txt"),
     file:del_dir(Dir ++ "dir").
+
+-endif.

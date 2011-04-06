@@ -4,9 +4,11 @@ delback
 A small backup program. Written to learn Erlang.
 
 HOWTO Build:
+make all
 
 
 HOWTO Develop:
+
 
 Version:
 Get latest version from

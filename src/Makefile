@@ -40,18 +40,23 @@ MODULES= \
 
 TARGET_FILES=$(MODULES:%=$(EBIN)/%.beam)
 
-ERL_COMPILE_FLAGS += -W
+ERL_COMPILE_FLAGS += -W -DTEST
 
 # ----------
 # TARGETS
 # ----------
 
-all: compile
+all: compile test
 
 compile: $(TARGET_FILES)
 
 delback: compile
-	${ERL} -pa $(EBIN) -s delback start
+	$(ERL) -pa $(EBIN) -s delback start
+
+test: 	
+	$(ERL) -noshell -pa $(EBIN) \
+	 -eval 'eunit:test("../ebin", [verbose])' \
+	 -s init stop
 
 clean:
 	rm -f $(TARGET_FILES)
