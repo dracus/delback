@@ -29,17 +29,28 @@
 
 -include_lib("kernel/include/file.hrl").
 
+%% 
+%% Exported functions
+%%
+
+-spec start() -> ok.
 start() ->
     delback_store:open("delback.db").
 
+-spec stop() -> ok.
 stop() ->
     delback_store:close().
 
+-spec copy_files([{From::file:filename(), To::file:filename()}]) -> done.
 copy_files([]) ->
     done;
 copy_files([{From, To}|T]) ->
     copy_files(From, To),
     copy_files(T).
+
+%%
+%% Internal functions
+%%
 
 copy_files(Dir, To) ->
     file:make_dir(To),
@@ -47,7 +58,7 @@ copy_files(Dir, To) ->
     case file:list_dir(Dir) of
 	{ok, Files} -> [io:format("File: ~p~n", [File]) || File <- Files],
 	               [backup_file(Dir, To, File) 
-			|| File <- Files, filelib:is_file(Dir ++ File)],
+			|| File <- Files, filelib:is_regular(Dir ++ File)],
 		       [copy_files(Dir ++ File ++ "/", To ++ File ++ "/") 
 			|| File <- Files, filelib:is_dir(Dir ++ File)];
 	{error, Reason} -> io:format("***Error: ~p~n", [Reason])
@@ -55,37 +66,44 @@ copy_files(Dir, To) ->
     filelib:is_dir(Dir).
 
 
-%% only copy file if it do not exist or have another modified date
+%% only copy file if it do not exist or have another checksum from its data
 backup_file(From, To, File) ->
     SrcFile = filename:join(From, File),
     DstFile = filename:join(To, File),
     {ok, SrcInfo} = file:read_file_info(SrcFile),
-    Checksum = delback_store:lookup(crypto:sha(SrcFile)),
-    case file:read_file_info(DstFile) of
-	{ok, DstInfo} -> 
-	    DstModifiedTime = DstInfo#file_info.mtime,
-	    SrcModifiedTime = SrcInfo#file_info.mtime,
-	    io:format("DstMTime: ~p~n", [DstModifiedTime]),
-	    io:format("SrcMTime: ~p~n", [SrcModifiedTime]),
-	    if 
-		DstModifiedTime =/= SrcModifiedTime ->
-		    do_file_copy(SrcFile, DstFile, SrcInfo);
-		true ->
-		    io:format("No need to backup file: ~p~n", [File])
+    case filelib:is_file(DstFile) of
+	true ->
+	    {ok, DstData} = file:read_file(DstFile),
+	    DstValue = crypto:sha(DstData),
+	    case delback_store:lookup(SrcFile) of
+		error ->
+		    {ok, SrcData} = file:read_file(SrcFile),
+		    delback_store:store(SrcFile, crypto:sha(SrcData));
+		    %,
+		    %do_file_copy(SrcFile, DstFile, SrcInfo);
+		Value ->
+		    if 
+			Value =/= DstValue ->
+			    do_file_copy(SrcFile, DstFile, SrcInfo);
+			true ->
+			    io:format("No need to backup file: ~p~n", [File])
+		    end
 	    end;
-	{error, enoent} -> 
+	false ->
 	    do_file_copy(SrcFile, DstFile, SrcInfo)
     end.
+
 
 do_file_copy(Src, Dst, Info) ->
     file:copy(Src, Dst),
     file:write_file_info(Dst, Info).
 
-
+%%
 %% TEST
+%%
+
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
-
 
 copy_test() ->
     start(),

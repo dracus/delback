@@ -27,6 +27,11 @@
 -module(delback_store).
 -export([open/1, close/0, store/2, lookup/1]).
 
+%%
+%% Exported functions
+%%
+
+-spec open(File::file:filename()) -> true.
 open(File) ->
     %Exists = filelib:is_file(File),
     case dets:open_file(?MODULE, [{file, File}]) of
@@ -36,21 +41,27 @@ open(File) ->
 	    exit(error_dets_open)
     end.
 
+-spec close() -> ok | {error, term()}.
 close() ->
     dets:close(?MODULE).
 
-%% @spec store(string(), string())
-store(Key, Filename) ->
-    dets:insert(?MODULE, [{Key, Filename}]).
 
-%% @spec lookup(string()) -> error | string().
+-spec store(Key::string(), Value::string()) ->
+		   ok | {error, term()}.
+store(Key, Value) ->
+    dets:insert(?MODULE, [{Key, Value}]).
+
+-spec lookup(Key::string()) -> error | string().
 lookup(Key) ->
     case dets:lookup(?MODULE, Key) of
 	[] -> error;
-	[{_, Filename}] -> Filename
+	[{_, Value}] -> Value
     end.
 
+%%
 %% TEST
+%%
+
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 
@@ -71,6 +82,5 @@ lookup_test() ->
     store("key", "value"),
     ?assert(lookup("key") =:= "value"),
     close().
-
 
 -endif.
