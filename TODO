@@ -3,16 +3,18 @@ What TODO
 Better error handling of copy
 Use fold_files in filelib for recursive search
 Update README
-Fix TEST define in Makefile
-Add mnesia for storing what we have copied (checksums) 
-http://tidier.softlab.ntua.gr:20000/tidier/getstarted
+Add mnesia for storing what we have copied (checksums) (or stay with dets?)
 Make target for dialyzer
+Fix TEST define in Makefile
+Use rebar build script instead of Makefile
+http://tidier.softlab.ntua.gr:20000/tidier/getstarted
+Clean up...
+Look up typer
 
 FUTURE
 
 Better error handling of all
-Add GUI
-Use OTP structure
-Rebar build script
-Support hot-code loading
+Add GUI (just for fun)
+Use OTP structure and workers for copy
+Support hot-code loading (just for fun)
 Net capable
