@@ -57,9 +57,11 @@ copy_files(Dir, To) ->
 
 %% only copy file if it do not exist or have another modified date
 backup_file(From, To, File) ->
-    {ok, SrcInfo} = file:read_file_info(From ++ File),
-    Checksum = delback_store:lookup(crypto:sha(From ++ File)),
-    case file:read_file_info(To ++ File) of
+    SrcFile = filename:join(From, File),
+    DstFile = filename:join(To, File),
+    {ok, SrcInfo} = file:read_file_info(SrcFile),
+    Checksum = delback_store:lookup(crypto:sha(SrcFile)),
+    case file:read_file_info(DstFile) of
 	{ok, DstInfo} -> 
 	    DstModifiedTime = DstInfo#file_info.mtime,
 	    SrcModifiedTime = SrcInfo#file_info.mtime,
@@ -67,12 +69,12 @@ backup_file(From, To, File) ->
 	    io:format("SrcMTime: ~p~n", [SrcModifiedTime]),
 	    if 
 		DstModifiedTime =/= SrcModifiedTime ->
-		    do_file_copy(From ++ File, To ++ File, SrcInfo);
+		    do_file_copy(SrcFile, DstFile, SrcInfo);
 		true ->
 		    io:format("No need to backup file: ~p~n", [File])
 	    end;
 	{error, enoent} -> 
-	    do_file_copy(From ++ File, To ++ File, SrcInfo)
+	    do_file_copy(SrcFile, DstFile, SrcInfo)
     end.
 
 do_file_copy(Src, Dst, Info) ->

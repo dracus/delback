@@ -1,6 +1,7 @@
 What TODO
 
 Better error handling of copy
+Use fold_files in filelib for recursive search
 Update README
 Fix TEST define in Makefile
 Add mnesia for storing what we have copied (checksums) 
