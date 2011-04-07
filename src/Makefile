@@ -41,7 +41,7 @@ MODULES= \
 
 TARGET_FILES=$(MODULES:%=$(EBIN)/%.beam)
 
-ERL_COMPILE_FLAGS += -W -DTEST
+ERL_COMPILE_FLAGS += -W -DTEST +debug_info
 
 # ----------
 # TARGETS
